@@ -70,5 +70,8 @@ Vagrant.configure("2") do |config|
     tar -xvjf criu-3.16.tar.bz2
     cd /home/vagrant/criu-3.16
     make install
+    mkdir -p /etc/docker
+    echo '{"experimental": true}' >> /etc/docker/daemon.json
+    service docker restart
   SHELL
 end
