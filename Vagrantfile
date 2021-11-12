@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "generic/alpine314"
-  config.vm.synced_folder "./", "/home/vagrant/project"
+  config.vm.box = "alvistack/ubuntu-21.04"
+  # config.vm.synced_folder "./", "/home/vagrant/project"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -62,13 +62,18 @@ Vagrant.configure("2") do |config|
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    apk add docker
-    addgroup vagrant docker
-    rc-update add docker boot
-    apk --update add build-base protobuf-dev protobuf-c-dev openssl iptables wget tar ip6tables linux-headers libnet-dev libnl3-dev libcap-dev python3 libaio-dev pkgconfig asciidoc xmlto git
-    wget https://download.openvz.org/criu/criu-3.16.tar.bz2
-    tar -xvjf criu-3.16.tar.bz2
-    cd /home/vagrant/criu-3.16
-    make install
+    apt-get update
+    apt-get install -y ca-certificates curl gnupg lsb-release
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install -y docker docker-compose
+    apt-get install -y criu
+    mkdir -p /etc/docker
+    echo '{"experimental": true}' >> /etc/docker/daemon.json
+    sudo usermod -aG docker vagrant
+    systemctl enable docker.service
+    systemctl restart docker.service
   SHELL
 end

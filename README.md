@@ -3,18 +3,11 @@
 1. Install vagrant and virtualbox
 2. setup virtual machine with ``vagrant up``
 3. login to machine with ``vagrant ssh``
-4. Need to setup docker to work with criu. Sorry couldn't setup it automatically with vagrant for some reason.
-
-```bash
-sudo su
-echo "{\"experimental\": true}" >> /etc/docker/daemon.json
-service docker start
-```
 
 # Usage
 
-0. ``cd project``
-1. ``docker build . -t loop`` if docker service is down start it with ``sudo service docker start``
+0. ``cd /vagrant``
+1. ``docker build . -t loop``
 2. Start container ``docker run -d --name loop loop``
 3. Wait at least 10 seconds
 4. See logs ``docker logs loop``
