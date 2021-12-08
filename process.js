@@ -1,21 +1,25 @@
-function createPrintI(i) {
-  return () => {
-    console.log(`i = ${i}`);
-    return createPrintI(i + 1);
-  }
+const http = require('http');
+
+let i = 0;
+
+const requestListener = async function (req, res) {
+  let body = '';
+
+  req.on('data', function (data) {
+      body += data;
+  });
+
+  req.on('end', function () {
+      const input = JSON.parse(body);
+      i = i + input;
+
+      console.log({ input, i });
+
+      res.writeHead(200, {'Content-Type': 'text/plain'});
+      res.end(`i = ${i}`);
+
+  });
 }
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-let printI = createPrintI(0);
-
-async function run() {
-  while (true) {
-    printI = printI();
-    await delay(2000);
-  }
-}
-
-run().then(() => {});
+const server = http.createServer(requestListener);
+server.listen(4080);
